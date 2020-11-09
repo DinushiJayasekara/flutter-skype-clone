@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "145220238111",
+    "firebase_url": "https://flutter-skype-clone-fbc56.firebaseio.com",
+    "project_id": "flutter-skype-clone-fbc56",
+    "storage_bucket": "flutter-skype-clone-fbc56.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:145220238111:android:39cc08dfea1f7c8ab70e2a",
+        "android_client_info": {
+          "package_name": "com.example.skype_clone"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "145220238111-5f2231ep49gk0u3hbtvgtmokoidpgm1b.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.skype_clone",
+            "certificate_hash": "611626329d603507b937268b9b965ad8fb5d70b6"
+          }
+        },
+        {
+          "client_id": "145220238111-4r1d2urgjm2vnbkeihqa7uprm8ml9vd0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCuoL1gyqeO86vY78fQOZGo_08uKbWU0Ps"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "145220238111-4r1d2urgjm2vnbkeihqa7uprm8ml9vd0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
