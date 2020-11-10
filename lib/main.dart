@@ -21,6 +21,8 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    // _repository.signOut();
+
     return MaterialApp(
       title: 'Skype Clone',
       debugShowCheckedModeBanner: false,
