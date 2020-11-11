@@ -35,6 +35,6 @@ class Member {
     this.username = mapData['username'];
     this.status = mapData['status'];
     this.state = mapData['state'];
-    this.profilePhoto = mapData['profilePhoto'];
+    this.profilePhoto = mapData['profile_photo'];
   }
 }
