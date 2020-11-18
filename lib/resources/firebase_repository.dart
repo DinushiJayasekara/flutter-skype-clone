@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:skype_clone/models/member.dart';
+import 'package:skype_clone/models/message.dart';
 import 'package:skype_clone/resources/firebase_methods.dart';
 
 class FirebaseRepository {
@@ -18,4 +19,8 @@ class FirebaseRepository {
 
   Future<List<Member>> fetchAllUsers(User user) =>
       _firebaseMethods.fetchAllUsers(user);
+
+  Future<void> addMessageToDb(
+          Message message, Member sender, Member receiver) =>
+      _firebaseMethods.addMessageToDb(message, sender, receiver);
 }

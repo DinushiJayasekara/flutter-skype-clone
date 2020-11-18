@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:skype_clone/models/member.dart';
+import 'package:skype_clone/models/message.dart';
+import 'package:skype_clone/resources/firebase_repository.dart';
 import 'package:skype_clone/utils/universal_variables.dart';
 import 'package:skype_clone/widgets/appbar.dart';
 import 'package:skype_clone/widgets/custom_tile.dart';
@@ -15,8 +18,29 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   TextEditingController textFieldController = TextEditingController();
+  FirebaseRepository _repository = FirebaseRepository();
+
+  Member sender;
+
+  String _currentUserId;
 
   bool isWriting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _repository.getCurrentUser().then((user) {
+      _currentUserId = user.uid;
+
+      setState(() {
+        sender = Member(
+          uid: user.uid,
+          name: user.displayName,
+          profilePhoto: user.photoURL,
+        );
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,25 +59,45 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget messageList() {
-    return ListView.builder(
-      padding: EdgeInsets.all(10.0),
-      itemCount: 6,
-      itemBuilder: (context, index) {
-        return chatMessageItem();
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance
+          .collection('messages')
+          .doc(_currentUserId)
+          .collection(widget.receiver.uid)
+          .orderBy('timestamp', descending: true)
+          .snapshots(),
+      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.data == null) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        return ListView.builder(
+          padding: EdgeInsets.all(10.0),
+          itemCount: snapshot.data.docs.length,
+          itemBuilder: (context, index) {
+            return chatMessageItem(snapshot.data.docs[index]);
+          },
+        );
       },
     );
   }
 
-  Widget chatMessageItem() {
+  Widget chatMessageItem(DocumentSnapshot snapshot) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 15.0),
       child: Container(
-        child: senderLayout(),
+        alignment: snapshot['senderId'] == _currentUserId
+            ? Alignment.centerRight
+            : Alignment.centerLeft,
+        child: snapshot['senderId'] == _currentUserId
+            ? senderLayout(snapshot)
+            : receiverLayout(snapshot),
       ),
     );
   }
 
-  Widget senderLayout() {
+  Widget senderLayout(DocumentSnapshot snapshot) {
     Radius messageRadius = Radius.circular(10.0);
 
     return Container(
@@ -71,18 +115,22 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
       child: Padding(
         padding: EdgeInsets.all(10.0),
-        child: Text(
-          'Hello',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16.0,
-          ),
-        ),
+        child: getMessage(snapshot),
       ),
     );
   }
 
-  Widget receiverLayout() {
+  getMessage(DocumentSnapshot snapshot) {
+    return Text(
+      snapshot['message'],
+      style: TextStyle(
+        color: Colors.white,
+        fontSize: 16.0,
+      ),
+    );
+  }
+
+  Widget receiverLayout(DocumentSnapshot snapshot) {
     Radius messageRadius = Radius.circular(10.0);
 
     return Container(
@@ -99,13 +147,7 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
       child: Padding(
         padding: EdgeInsets.all(10.0),
-        child: Text(
-          'Hello',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16.0,
-          ),
-        ),
+        child: getMessage(snapshot),
       ),
     );
   }
@@ -259,13 +301,31 @@ class _ChatScreenState extends State<ChatScreen> {
                       Icons.send,
                       size: 15.0,
                     ),
-                    onPressed: () {},
+                    onPressed: () => sendMessage(),
                   ),
                 )
               : Container(),
         ],
       ),
     );
+  }
+
+  sendMessage() {
+    var text = textFieldController.text;
+
+    Message _message = Message(
+      receiverId: widget.receiver.uid,
+      senderId: sender.uid,
+      message: text,
+      timestamp: FieldValue.serverTimestamp(),
+      type: 'text',
+    );
+
+    setState(() {
+      isWriting = false;
+    });
+
+    _repository.addMessageToDb(_message, sender, widget.receiver);
   }
 
   CustomAppBar customAppBar(context) {
