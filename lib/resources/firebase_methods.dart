@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:skype_clone/constants/strings.dart';
 import 'package:skype_clone/models/member.dart';
 import 'package:skype_clone/models/message.dart';
 import 'package:skype_clone/utils/utilities.dart';
@@ -35,8 +36,8 @@ class FirebaseMethods {
 
   Future<bool> authenticateUser(User user) async {
     QuerySnapshot result = await _firebaseFirestore
-        .collection('users')
-        .where('email', isEqualTo: user.email)
+        .collection(USERS_COLLECTION)
+        .where(EMAIL_FIELD, isEqualTo: user.email)
         .get();
 
     final List<DocumentSnapshot> docs = result.docs;
@@ -56,7 +57,7 @@ class FirebaseMethods {
     );
 
     _firebaseFirestore
-        .collection('users')
+        .collection(USERS_COLLECTION)
         .doc(currentUser.uid)
         .set(member.toMap(member));
   }
@@ -71,7 +72,7 @@ class FirebaseMethods {
     List<Member> memberList = List<Member>();
 
     QuerySnapshot querySnapshot =
-        await _firebaseFirestore.collection('users').get();
+        await _firebaseFirestore.collection(USERS_COLLECTION).get();
 
     for (var i = 0; i < querySnapshot.docs.length; i++) {
       if (querySnapshot.docs[i].id != currentUser.uid) {
@@ -86,13 +87,13 @@ class FirebaseMethods {
     var map = message.toMap();
 
     await _firebaseFirestore
-        .collection('messages')
+        .collection(MESSAGES_COLLECTION)
         .doc(message.senderId)
         .collection(message.receiverId)
         .add(map);
 
     await _firebaseFirestore
-        .collection('messages')
+        .collection(MESSAGES_COLLECTION)
         .doc(message.receiverId)
         .collection(message.senderId)
         .add(map);
